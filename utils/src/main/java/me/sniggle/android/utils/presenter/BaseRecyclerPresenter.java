@@ -12,7 +12,11 @@ import me.sniggle.android.utils.adapter.BaseRecyclerViewAdapter;
 import me.sniggle.android.utils.application.BaseContext;
 
 /**
- * Created by iulius on 04/03/16.
+ * Specialized presenter to unify the behaviour for recycler views
+ * and updates of recycler views.
+ *
+ * @author iulius
+ * @since 1.0
  */
 public class BaseRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, AdapterItem, Ctx extends BaseContext> extends BasePresenter<Ctx> {
 
@@ -23,26 +27,56 @@ public class BaseRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, Adap
   protected final int loadingContainerId;
   private Adapter adapter;
 
-  protected BaseRecyclerPresenter(Context context, Ctx appContext, int recyclerViewId) {
-    this(context, appContext, recyclerViewId, -1);
+  /**
+   *
+   * @param appContext
+   *  the applications dependency context
+   * @param recyclerViewId
+   *  the id of the recycler view
+   */
+  protected BaseRecyclerPresenter(Ctx appContext, int recyclerViewId) {
+    this(appContext, recyclerViewId, -1);
   }
 
-  protected BaseRecyclerPresenter(Context context, Ctx appContext, int recyclerViewId, int loadingContainerId) {
-    super(context, appContext);
+  /**
+   *
+   * @param appContext
+   *   the applications dependency context
+   * @param recyclerViewId
+   *   the id of the recycler view
+   * @param loadingContainerId
+   *   the id of the loading container to be shown instead of the recycler view while loading data
+   */
+  protected BaseRecyclerPresenter(Ctx appContext, int recyclerViewId, int loadingContainerId) {
+    super(appContext);
     this.recyclerViewId = recyclerViewId;
     this.loadingContainerId = loadingContainerId;
   }
 
+  /**
+   * updates the recycler views adapter data
+   *
+   * @param adapterData
+   *  the data to be shown
+   */
   public void updateAdapterData(SparseArray<AdapterItem> adapterData) {
     adapter.updateAdapterData(adapterData);
     loadingContainer.setVisibility(View.GONE);
     recyclerView.setVisibility(View.VISIBLE);
   }
 
+  /**
+   * configures the recycler view, e.g. layout, adapter etc.
+   *
+   * defaults to a list layout
+   *
+   * @param recyclerView
+   *  the recycler view bound to this presenter
+   */
   protected void configureRecyclerView(RecyclerView recyclerView) {
     //recyclerView.addItemDecoration(new DividerItemDecoration(context, R.drawable.divider));
     recyclerView.setHasFixedSize(true);
-    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    recyclerView.setLayoutManager(new LinearLayoutManager(getAppContext().getContext()));
     recyclerView.setAdapter(adapter);
   }
 

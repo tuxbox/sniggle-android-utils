@@ -4,10 +4,10 @@ import android.content.Context;
 
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
-import com.squareup.otto.Bus;
 
 import java.io.IOException;
 
+import me.sniggle.android.utils.otto.ActivatorBus;
 import me.sniggle.android.utils.otto.MainThreadBus;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -15,7 +15,7 @@ import retrofit2.Retrofit;
 /**
  * Created by iulius on 04/03/16.
  */
-public abstract class BaseContext<HttpService, Database extends BaseCouchbase> {
+public abstract class BaseContext<HttpService, Database extends BaseCouchbase, AppBus extends ActivatorBus> {
 
   private final OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
   private final Context context;
@@ -23,7 +23,7 @@ public abstract class BaseContext<HttpService, Database extends BaseCouchbase> {
   private Manager couchbaseManager;
   private Retrofit retrofit;
   private HttpService httpService;
-  private Bus bus;
+  private AppBus bus;
   private Database database;
 
   protected BaseContext(Context context, Class<HttpService> httpServiceClass) {
@@ -31,9 +31,7 @@ public abstract class BaseContext<HttpService, Database extends BaseCouchbase> {
     this.context = context;
   }
 
-  protected Bus createBus() {
-    return new MainThreadBus();
-  }
+  protected abstract AppBus createBus();
 
   protected void configureHttpClient(OkHttpClient.Builder httpClientBuilder) {
 
@@ -92,7 +90,11 @@ public abstract class BaseContext<HttpService, Database extends BaseCouchbase> {
     postTerminate();
   }
 
-  public Bus getBus() {
+  public Context getContext() {
+    return context;
+  }
+
+  public AppBus getBus() {
     return bus;
   }
 

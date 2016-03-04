@@ -5,18 +5,21 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.squareup.otto.Bus;
-
 import java.util.LinkedList;
 
 import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.application.BaseCouchbase;
+import me.sniggle.android.utils.otto.ActivatorBus;
 
 /**
- * Created by iulius on 04/03/16.
+ * Basic Android Service supposed to be used for all events that trigger long-running tasks,
+ * like database access, API querying etc.
+ *
+ * @author iulius
+ * @since 1.0
  */
-public abstract class BaseEventService<HttpService, Database extends BaseCouchbase, Ctx extends BaseContext<HttpService, Database>, App extends BaseApplication<Ctx>> extends Service {
+public abstract class BaseEventService<HttpService, Database extends BaseCouchbase, AppBus extends ActivatorBus, Ctx extends BaseContext<HttpService, Database, AppBus>, App extends BaseApplication<Ctx>> extends Service {
 
   private final LinkedList<Object> eventHandlers = new LinkedList<>();
 
@@ -36,12 +39,40 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
     getAppContext().getBus().post(event);
   }
 
-  protected abstract void activateBus(Bus bus);
+  /**
+   * activates the bus to handle events properly
+   *
+   * this is necessary as the Service gets started asynchronously by Android
+   * hence it might not be available to handle events when the application
+   * already fires them
+   *
+   * @param bus
+   *   the applications event bus
+   */
+  protected void activateBus(AppBus bus) {
+    bus.activateBus();
+  }
 
-  protected abstract void deactivateBus(Bus bus);
+  /**
+   * deactivates the bus in order to notify that event handlers are not available anymore
+   *
+   * @see #activateBus(ActivatorBus)
+   *
+   * @param bus
+   *  the applications event bus
+   */
+  protected void deactivateBus(AppBus bus) {
+    bus.deactivateBus();
+  }
 
+  /**
+   * initializer method, e.g. you can add your event handlers here
+   */
   protected abstract void init();
 
+  /**
+   * life cycle function, deregisters the event handlers properly
+   */
   protected void unregisterHandlers() {
     Object eventHandler = null;
     while( ( eventHandler = eventHandlers.pollLast() ) != null ) {
@@ -49,6 +80,12 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
     }
   }
 
+  /**
+   * adds an event handler to the app's event bus
+   *
+   * @param eventHandler
+   *  the event handler to add
+   */
   protected void addEventHandler(Object eventHandler) {
     if( eventHandler != null ) {
       getAppContext().getBus().register(eventHandler);

@@ -48,8 +48,8 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
 
   protected void postCreateView(View view, Bundle savedInstanceState) {
     try {
-      Constructor<Presenter> constructor = presenterClass.getConstructor(Context.class, getAppContext().getClass());
-      presenter = constructor.newInstance(getActivity(), getAppContext());
+      Constructor<Presenter> constructor = presenterClass.getConstructor(getAppContext().getClass());
+      presenter = constructor.newInstance(getAppContext());
       presenter.onViewCreated(view);
     } catch (Exception e) {
       Log.e("fragment-presenter", e.getMessage());

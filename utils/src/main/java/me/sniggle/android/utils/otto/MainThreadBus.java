@@ -3,21 +3,15 @@ package me.sniggle.android.utils.otto;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by iulius on 04/03/16.
  */
-public class MainThreadBus extends Bus {
+public class MainThreadBus extends ActivatorBus {
 
   private static final Object LOCK = new Object();
   private final Handler handler = new Handler(Looper.getMainLooper());
-  private final Set<Object> eventCache = new HashSet<>();
-  private boolean active = false;
 
   public MainThreadBus() {
   }
@@ -34,39 +28,23 @@ public class MainThreadBus extends Bus {
     super(identifier);
   }
 
-  public void activateBus() {
-    synchronized (LOCK) {
-      for( Object event : eventCache ) {
-        post(event);
+  protected void postEvent(final Object event) {
+    if (event != null &&
+        event instanceof StickyThreadEvent &&
+        ((StickyThreadEvent) event).isStickToMainThread()) {
+      if (Looper.myLooper() == Looper.getMainLooper()) {
+        super.postEvent(event);
+      } else {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            MainThreadBus.super.postEvent(event);
+          }
+        });
       }
-      eventCache.clear();
-      active = true;
+    } else {
+      super.postEvent(event);
     }
   }
 
-  @Override
-  public void post(final Object event) {
-    synchronized (LOCK) {
-      if (active) {
-        if (event != null &&
-            event instanceof StickyThreadEvent &&
-            ((StickyThreadEvent) event).isStickToMainThread()) {
-          if (Looper.myLooper() == Looper.getMainLooper()) {
-            super.post(event);
-          } else {
-            handler.post(new Runnable() {
-              @Override
-              public void run() {
-                MainThreadBus.super.post(event);
-              }
-            });
-          }
-        } else {
-          super.post(event);
-        }
-      } else {
-        eventCache.add(event);
-      }
-    }
-  }
 }

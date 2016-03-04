@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.application.BaseCouchbase;
+import me.sniggle.android.utils.otto.ActivatorBus;
 import me.sniggle.android.utils.presenter.BasePresenter;
 
 /**
@@ -18,7 +19,8 @@ import me.sniggle.android.utils.presenter.BasePresenter;
 public abstract class BaseActivity<
       HttpService,
       Database extends BaseCouchbase,
-      Ctx extends BaseContext<HttpService, Database>,
+      AppBus extends ActivatorBus,
+      Ctx extends BaseContext<HttpService, Database, AppBus>,
       Application extends BaseApplication<Ctx>,
       Presenter extends BasePresenter<Ctx>
     > extends AppCompatActivity {
@@ -36,7 +38,7 @@ public abstract class BaseActivity<
   protected Presenter createPresenter() {
     Presenter presenter = null;
     try {
-      Constructor<Presenter> constructor = presenterClass.getConstructor(Context.class);
+      Constructor<Presenter> constructor = presenterClass.getConstructor(getAppContext().getClass());
       presenter = constructor.newInstance(this);
     } catch (Exception e) {
       Log.e("activity-presenter", e.getMessage());
