@@ -3,3 +3,5 @@
 **/gradle
 gradlew*
 local.properties
+**/.gradle
+**/utils/build
