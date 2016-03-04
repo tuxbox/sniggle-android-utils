@@ -7,16 +7,22 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Created by iulius on 04/03/16.
+ * A convenience extension of a regular Otto bus that caches events until the Bus is properly setup
+ * and all event handlers are ready to handle them.
+ * Dispatches all cached events in chronological order upon activation.
+ *
+ * @author iulius
+ * @since 1.0
  */
 public class ActivatorBus extends Bus {
 
   private static final Object LOCK = new Object();
   private final Handler handler = new Handler(Looper.getMainLooper());
-  private final Set<Object> eventCache = new HashSet<>();
+  private final Set<Object> eventCache = new LinkedHashSet<>();
   private boolean active = false;
 
   public ActivatorBus() {
@@ -38,6 +44,9 @@ public class ActivatorBus extends Bus {
     super.post(event);
   }
 
+  /**
+   * activates event dispatching
+   */
   public void activateBus() {
     synchronized (LOCK) {
       for( Object event : eventCache ) {
@@ -48,6 +57,9 @@ public class ActivatorBus extends Bus {
     }
   }
 
+  /**
+   * deactivates event dispatching
+   */
   public void deactivateBus() {
     synchronized (LOCK) {
       active = false;

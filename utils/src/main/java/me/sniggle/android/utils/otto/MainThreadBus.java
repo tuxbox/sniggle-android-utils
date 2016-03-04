@@ -6,7 +6,10 @@ import android.os.Looper;
 import com.squareup.otto.ThreadEnforcer;
 
 /**
- * Created by iulius on 04/03/16.
+ * Extension of {#ActivatorBus} ensuring that sticky events are executed on the Main Thread if required
+ *
+ * @author iulius
+ * @since 1.0
  */
 public class MainThreadBus extends ActivatorBus {
 

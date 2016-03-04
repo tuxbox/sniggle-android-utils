@@ -1,7 +1,10 @@
 package me.sniggle.android.utils.otto;
 
 /**
- * Created by iulius on 04/03/16.
+ * An event that you can enforce to be executed on the MainThread
+ *
+ * @author iulius
+ * @since 1.0
  */
 public abstract class StickyThreadEvent {
 

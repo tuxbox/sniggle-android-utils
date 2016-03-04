@@ -5,7 +5,14 @@ import android.app.Application;
 import org.acra.ACRA;
 
 /**
- * Created by iulius on 04/03/16.
+ * convenience application object that performs initialization of the dependency context
+ * and sets up ACRA for crash reporting
+ *
+ * @author iulius
+ * @since 1.0
+ *
+ * @param <Context>
+ *   the app's dependency context
  */
 public abstract class BaseApplication<Context extends BaseContext> extends Application {
 

@@ -3,7 +3,10 @@ package me.sniggle.android.utils.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Created by iulius on 04/03/16.
+ * A convenience base model that contains the minimum sensible properties of any Couchbase model
+ *
+ * @author iulius
+ * @since 1.0
  */
 public abstract class BaseCouchbaseModel {
 

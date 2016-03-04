@@ -1,6 +1,5 @@
 package me.sniggle.android.utils.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,7 +15,12 @@ import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.presenter.BasePresenter;
 
 /**
- * Created by iulius on 04/03/16.
+ * A convenience fragment implementation, automatically inflating the associated layout,
+ * creating the appropriate presenter, registering the fragment as subscriber to the event bus
+ * and allowing to publish new events
+ *
+ * @author iulius
+ * @since 1.0
  */
 public abstract class BaseFragment<Ctx extends BaseContext, Application extends BaseApplication<Ctx>, Presenter extends BasePresenter<Ctx>> extends Fragment {
 
@@ -25,27 +29,68 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
 
   private Presenter presenter;
 
+  /**
+   *
+   * @param layoutId
+   *  the id of the required layout
+   * @param presenterClass
+   *  the class of the presenter to be used
+   */
   protected BaseFragment(int layoutId, Class<Presenter> presenterClass) {
     this.layoutId = layoutId;
     this.presenterClass = presenterClass;
   }
 
+  /**
+   *
+   * @return
+   *    the app's dependency context
+   */
   protected Ctx getAppContext() {
     return ((Application)getActivity().getApplication()).getAppContext();
   }
 
+  /**
+   * publishes an event to the app's event bus
+   *
+   * @param event
+   *  event to be published
+   */
   protected void publishEvent(Object event) {
     getAppContext().getBus().post(event);
   }
 
+  /**
+   * called before view creating to allow early fragment configurations, e.g. registering
+   * the fragment to the app's event bus
+   */
   protected void preCreateView() {
     getAppContext().getBus().register(this);
   }
 
+  /**
+   * creates the view like the Android method {#onCreateView}
+   *
+   * @param inflater
+   *  the inflater
+   * @param container
+   *  the container
+   * @param savedInstanceState
+   *  the saved instance state
+   * @return the inflated view
+   */
   protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     return inflater.inflate(layoutId, container, false);
   }
 
+  /**
+   * performs configurations using the newly created view, e.g. initializing the associated presenter
+   *
+   * @param view
+   *  the just created view
+   * @param savedInstanceState
+   *  the saved instance state
+   */
   protected void postCreateView(View view, Bundle savedInstanceState) {
     try {
       Constructor<Presenter> constructor = presenterClass.getConstructor(getAppContext().getClass());

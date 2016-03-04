@@ -1,6 +1,5 @@
 package me.sniggle.android.utils.activity;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,7 +13,21 @@ import me.sniggle.android.utils.otto.ActivatorBus;
 import me.sniggle.android.utils.presenter.BasePresenter;
 
 /**
- * Created by iulius on 04/03/16.
+ * Convenience BaseActivity that initializes the activity with all necessary
+ * dependencies
+ *
+ * @param <HttpService>
+ *   the Retrofit HTTP service
+ * @param <Database>
+ *   the Couchbase Database
+ * @param <AppBus>
+ *   the app's event bus
+ * @param <Ctx>
+ *   the app's dependency context
+ * @param <Application>
+ *   the app's application Object
+ * @param <Presenter>
+ *   the presenter for this activity
  */
 public abstract class BaseActivity<
       HttpService,
@@ -29,12 +42,24 @@ public abstract class BaseActivity<
   private final Class<Presenter> presenterClass;
   private Presenter presenter;
 
+  /**
+   *
+   * @param layoutId
+   *  the layout id for the activities' layout
+   * @param presenterClass
+   *  the class of the associated presenter
+   */
   protected BaseActivity(int layoutId, Class<Presenter> presenterClass) {
     super();
     this.layoutId = layoutId;
     this.presenterClass = presenterClass;
   }
 
+  /**
+   * default presenter factory method
+   *
+   * @return the appropriate presenter
+   */
   protected Presenter createPresenter() {
     Presenter presenter = null;
     try {
