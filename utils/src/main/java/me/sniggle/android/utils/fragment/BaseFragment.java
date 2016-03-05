@@ -60,6 +60,17 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
     getAppContext().getBus().post(event);
   }
 
+  protected Presenter createPresenter() {
+    Presenter presenter = null;
+    try {
+      Constructor<Presenter> constructor = presenterClass.getConstructor(getAppContext().getClass());
+      presenter = constructor.newInstance(getAppContext());
+    } catch (Exception e) {
+      Log.e("fragment-presenter", e.getMessage());
+    }
+    return presenter;
+  }
+
   /**
    * called before view creating to allow early fragment configurations, e.g. registering
    * the fragment to the app's event bus
@@ -92,13 +103,11 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
    *  the saved instance state
    */
   protected void postCreateView(View view, Bundle savedInstanceState) {
-    try {
-      Constructor<Presenter> constructor = presenterClass.getConstructor(getAppContext().getClass());
-      presenter = constructor.newInstance(getAppContext());
-      presenter.onViewCreated(view);
-    } catch (Exception e) {
-      Log.e("fragment-presenter", e.getMessage());
+    presenter = createPresenter();
+    if( presenter == null ) {
+      throw new RuntimeException("Failed to create presenter for fragment");
     }
+    presenter.onViewCreated(view);
   }
 
   @Nullable

@@ -64,7 +64,7 @@ public abstract class BaseActivity<
     Presenter presenter = null;
     try {
       Constructor<Presenter> constructor = presenterClass.getConstructor(getAppContext().getClass());
-      presenter = constructor.newInstance(this);
+      presenter = constructor.newInstance(getAppContext());
     } catch (Exception e) {
       Log.e("activity-presenter", e.getMessage());
     }
