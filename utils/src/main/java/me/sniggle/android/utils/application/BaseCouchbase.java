@@ -97,7 +97,7 @@ public class BaseCouchbase {
    *  the source object
    * @return the corresponding map
    */
-  protected Map<String,Object> convertJsonModelToMap(Object source) {
+  public Map<String,Object> convertJsonModelToMap(Object source) {
     return objectMapper.convertValue(source, Map.class);
   }
 
@@ -112,7 +112,7 @@ public class BaseCouchbase {
    *  the target type
    * @return the object representation of the document
    */
-  protected <T> T convertDocumentToModel(Document document, Class<T> modelClass) {
+  public <T> T convertDocumentToModel(Document document, Class<T> modelClass) {
     return objectMapper.convertValue(document.getProperties(), modelClass);
   }
 
