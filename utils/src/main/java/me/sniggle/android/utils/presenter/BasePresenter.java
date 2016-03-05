@@ -1,6 +1,7 @@
 package me.sniggle.android.utils.presenter;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.view.View;
 
 import butterknife.ButterKnife;
@@ -22,10 +23,6 @@ public abstract class BasePresenter<Ctx extends BaseContext> {
     this.appContext = appContext;
   }
 
-  protected void init() {
-
-  }
-
   protected Ctx getAppContext() {
     return appContext;
   }
@@ -41,6 +38,53 @@ public abstract class BasePresenter<Ctx extends BaseContext> {
   }
 
   /**
+   * method bound to #onViewCreated used to configure stuff before e.g. the views are bound
+   */
+  protected void preViewCreated() {
+
+  }
+
+  /**
+   * method bound to #onViewCreated used to actually work with the parent view and e.g. bind
+   * the children views to this presenter
+   *
+   * @param activity
+   *    the source activity
+   */
+  protected void viewCreated(Activity activity) {
+    ButterKnife.bind(this, activity);
+  }
+
+  /**
+   * method bound to #onViewCreated used to actually work with the parent view and e.g. bind
+   * the children views to this presenter
+   *
+   * @param view
+   *    the source view
+   */
+  protected void viewCreated(View view) {
+    ButterKnife.bind(this, view);
+  }
+
+  /**
+   * method bound to #onViewCreated used to actually work with the parent view and e.g. bind
+   * the children views to this presenter
+   *
+   * @param dialog
+   *    the source dialog
+   */
+  protected void viewCreated(Dialog dialog) {
+    ButterKnife.bind(this, dialog);
+  }
+
+  /**
+   * method bound to #onViewCreated used to configure e.g. bound views etc.
+   */
+  protected void postViewCreated() {
+
+  }
+
+  /**
    * life cycle method used to initialize and e.g. bind views
    * of the given activity
    *
@@ -48,8 +92,9 @@ public abstract class BasePresenter<Ctx extends BaseContext> {
    *  the parent activity
    */
   public void onViewCreated(Activity activity) {
-    init();
-    ButterKnife.bind(this, activity);
+    preViewCreated();
+    viewCreated(activity);
+    postViewCreated();
   }
 
   /**
@@ -59,8 +104,21 @@ public abstract class BasePresenter<Ctx extends BaseContext> {
    * @param container
    */
   public void onViewCreated(View container) {
-    init();
-    ButterKnife.bind(this, container);
+    preViewCreated();
+    viewCreated(container);
+    postViewCreated();
+  }
+
+  /**
+   * life cycle method used to initialize and e.g. bind views
+   * of the given container
+   *
+   * @param dialog
+   */
+  public void onViewCreated(Dialog dialog) {
+    preViewCreated();
+    viewCreated(dialog);
+    postViewCreated();
   }
 
   /**

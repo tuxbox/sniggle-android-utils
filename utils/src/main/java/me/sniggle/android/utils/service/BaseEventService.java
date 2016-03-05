@@ -67,8 +67,22 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
 
   /**
    * initializer method, e.g. you can add your event handlers here
+   * bound to #onCreate
    */
-  protected abstract void init();
+  protected abstract void preCreate();
+
+  /**
+   * initializer method, set up your service here, bound to #onCreate
+   */
+  protected void create() {
+  }
+
+  /**
+   * initializer method, configure your service here and e.g. activate the bus, bound to #onCreate
+   */
+  protected void postCreate() {
+    activateBus(getAppContext().getBus());
+  }
 
   /**
    * life cycle function, deregisters the event handlers properly
@@ -102,8 +116,9 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
   @Override
   public void onCreate() {
     super.onCreate();
-    init();
-    activateBus(getAppContext().getBus());
+    preCreate();
+    create();
+    postCreate();
   }
 
   @Override

@@ -83,16 +83,29 @@ public abstract class BaseActivity<
     getAppContext().getBus().post(event);
   }
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  protected void preCreate() {
+
+  }
+
+  protected void create() {
     setContentView(layoutId);
     presenter = createPresenter();
     if( presenter == null ) {
       throw new RuntimeException("Failed to create presenter for activity");
     }
+  }
+
+  protected void postCreate() {
     presenter.onViewCreated(this);
     getAppContext().getBus().register(this);
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    preCreate();
+    create();
+    postCreate();
   }
 
   @Override

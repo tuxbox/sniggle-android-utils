@@ -1,6 +1,7 @@
 package me.sniggle.android.utils.presenter;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,26 +82,44 @@ public class BaseRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, Adap
   }
 
   @Override
-  public void onViewCreated(Activity activity) {
-    super.onViewCreated(activity);
+  protected void viewCreated(Activity activity) {
+    super.viewCreated(activity);
     if( recyclerViewId > 0 ) {
       recyclerView = ButterKnife.findById(activity, recyclerViewId);
     }
     if( loadingContainerId > 0 ) {
       loadingContainer = ButterKnife.findById(activity, loadingContainerId);
     }
-    configureRecyclerView(recyclerView);
   }
 
   @Override
-  public void onViewCreated(View view) {
-    super.onViewCreated(view);
+  protected void viewCreated(Dialog dialog) {
+    super.viewCreated(dialog);
+    if( recyclerViewId > 0 ) {
+      recyclerView = ButterKnife.findById(dialog, recyclerViewId);
+    }
+    if( loadingContainerId > 0 ) {
+      loadingContainer = ButterKnife.findById(dialog, loadingContainerId);
+    }
+  }
+
+  @Override
+  protected void viewCreated(View view) {
+    super.viewCreated(view);
     if( recyclerViewId > 0 ) {
       recyclerView = ButterKnife.findById(view, recyclerViewId);
     }
     if( loadingContainerId > 0 ) {
       loadingContainer = ButterKnife.findById(view, loadingContainerId);
     }
-    configureRecyclerView(recyclerView);
   }
+
+  @Override
+  protected void postViewCreated() {
+    super.postViewCreated();
+    if( recyclerViewId > 0 ) {
+      configureRecyclerView(recyclerView);
+    }
+  }
+
 }
