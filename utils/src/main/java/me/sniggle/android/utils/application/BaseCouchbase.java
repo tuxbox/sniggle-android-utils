@@ -189,7 +189,7 @@ public class BaseCouchbase {
    * @return true if update was successful
    */
   public boolean updateDocument(Document currentDocument, Object object) {
-    return updateDocument(currentDocument, objectMapper.convertValue(object, Map.class));
+    return updateDocument(currentDocument.getId(), objectMapper.convertValue(object, Map.class));
   }
 
   /**
