@@ -180,7 +180,6 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
   @Override
   public void onDestroy() {
     presenter.onDestroy();
-    presenter = null;
     super.onDestroy();
   }
 
