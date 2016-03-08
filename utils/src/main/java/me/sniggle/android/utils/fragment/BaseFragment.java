@@ -174,13 +174,13 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
   public void onDestroyView() {
     getAppContext().getBus().unregister(this);
     this.presenter.onDestroyView();
-    presenter = null;
     super.onDestroyView();
   }
 
   @Override
   public void onDestroy() {
     presenter.onDestroy();
+    presenter = null;
     super.onDestroy();
   }
 
