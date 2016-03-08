@@ -1,5 +1,6 @@
 package me.sniggle.android.utils.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import java.lang.reflect.Constructor;
 import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.presenter.BasePresenter;
+import me.sniggle.android.utils.presenter.FragmentPresenter;
 
 /**
  * A convenience fragment implementation, automatically inflating the associated layout,
@@ -22,7 +24,7 @@ import me.sniggle.android.utils.presenter.BasePresenter;
  * @author iulius
  * @since 1.0
  */
-public abstract class BaseFragment<Ctx extends BaseContext, Application extends BaseApplication<Ctx>, Presenter extends BasePresenter<Ctx>> extends Fragment {
+public abstract class BaseFragment<Ctx extends BaseContext, Application extends BaseApplication<Ctx>, Presenter extends BasePresenter<Ctx> & FragmentPresenter> extends Fragment {
 
   private final Class<Presenter> presenterClass;
   private final int layoutId;
@@ -103,20 +105,69 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
    *  the saved instance state
    */
   protected void postCreateView(View view, Bundle savedInstanceState) {
-    presenter = createPresenter();
     if( presenter == null ) {
       throw new RuntimeException("Failed to create presenter for fragment");
     }
     presenter.onViewCreated(view);
   }
 
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    presenter = createPresenter();
+    presenter.onAttach(context);
+  }
+
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    presenter.onCreate(savedInstanceState);
+  }
+
   @Nullable
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    presenter.onCreateView();
     preCreateView();
     View result = createView(inflater, container, savedInstanceState);
     postCreateView(result, savedInstanceState);
     return result;
+  }
+
+  @Override
+  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    presenter.onViewCreated(view);
+  }
+
+  @Override
+  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    presenter.onActivityCreated(savedInstanceState);
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    presenter.onStart();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    presenter.onResume();
+  }
+
+  @Override
+  public void onPause() {
+    presenter.onPause();
+    super.onPause();
+  }
+
+  @Override
+  public void onStop() {
+    presenter.onStop();
+    super.onStop();
   }
 
   @Override
@@ -125,6 +176,19 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
     this.presenter.onDestroyView();
     presenter = null;
     super.onDestroyView();
+  }
+
+  @Override
+  public void onDestroy() {
+    presenter.onDestroy();
+    super.onDestroy();
+  }
+
+  @Override
+  public void onDetach() {
+    presenter.onDetach();
+    presenter = null;
+    super.onDetach();
   }
 
 }

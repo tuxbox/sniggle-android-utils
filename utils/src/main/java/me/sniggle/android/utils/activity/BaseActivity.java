@@ -10,6 +10,8 @@ import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.application.BaseCouchbase;
 import me.sniggle.android.utils.otto.ActivatorBus;
+import me.sniggle.android.utils.presenter.ActivityPresenter;
+import me.sniggle.android.utils.presenter.BaseActivityPresenter;
 import me.sniggle.android.utils.presenter.BasePresenter;
 
 /**
@@ -35,7 +37,7 @@ public abstract class BaseActivity<
       AppBus extends ActivatorBus,
       Ctx extends BaseContext<HttpService, Database, AppBus>,
       Application extends BaseApplication<Ctx>,
-      Presenter extends BasePresenter<Ctx>
+      Presenter extends BasePresenter<Ctx> & ActivityPresenter
     > extends AppCompatActivity {
 
   private final int layoutId;
@@ -87,15 +89,16 @@ public abstract class BaseActivity<
 
   }
 
-  protected void create() {
+  protected void create(Bundle savedInstanceState) {
     setContentView(layoutId);
     presenter = createPresenter();
     if( presenter == null ) {
       throw new RuntimeException("Failed to create presenter for activity");
     }
+    presenter.onCreate(savedInstanceState);
   }
 
-  protected void postCreate() {
+  protected void postCreate(Bundle savedInstanceState) {
     presenter.onViewCreated(this);
     getAppContext().getBus().register(this);
   }
@@ -104,14 +107,38 @@ public abstract class BaseActivity<
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     preCreate();
-    create();
-    postCreate();
+    create(savedInstanceState);
+    postCreate(savedInstanceState);
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    presenter.onStart();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    presenter.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    presenter.onPause();
+    super.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    presenter.onStop();
+    super.onStop();
   }
 
   @Override
   protected void onDestroy() {
+    presenter.onDestroy();
     getAppContext().getBus().unregister(this);
-    presenter.onDestroyView();
     super.onDestroy();
   }
 }
