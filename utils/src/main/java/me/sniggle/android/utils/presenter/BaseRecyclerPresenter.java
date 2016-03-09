@@ -67,7 +67,9 @@ public class BaseRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, Adap
    */
   public void updateAdapterData(SparseArray<AdapterItem> adapterData) {
     adapter.updateAdapterData(adapterData);
-    loadingContainer.setVisibility(View.GONE);
+    if( loadingContainer != null ) {
+      loadingContainer.setVisibility(View.GONE);
+    }
     recyclerView.setVisibility(View.VISIBLE);
   }
 
