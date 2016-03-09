@@ -3,6 +3,7 @@ package me.sniggle.android.utils.presenter;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 import me.sniggle.android.utils.application.BaseContext;
@@ -29,10 +30,8 @@ public abstract class BaseFragmentPresenter<Ctx extends BaseContext> extends Bas
   }
 
   @Override
-  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-    preViewCreated();
-    viewCreated(view);
-    postViewCreated();
+  public void onViewCreated(View view, @Nullable Bundle savedInstanceState, Fragment fragment) {
+    super.onViewCreated(view);
   }
 
   @Override

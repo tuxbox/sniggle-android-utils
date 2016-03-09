@@ -2,6 +2,7 @@ package me.sniggle.android.utils.presenter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 /**
@@ -38,8 +39,10 @@ public interface FragmentPresenter {
    *  the view created
    * @param savedInstanceState
    *   the last known state
+   * @param fragment
+   *   the parent fragment
    */
-  void onViewCreated(View view, Bundle savedInstanceState);
+  void onViewCreated(View view, Bundle savedInstanceState, Fragment fragment);
 
   /**
    * binds to Fragment#onActivityCreated(Activity)

@@ -137,7 +137,7 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    presenter.onViewCreated(view);
+    presenter.onViewCreated(view, savedInstanceState, this);
   }
 
   @Override
