@@ -2,6 +2,7 @@ package me.sniggle.android.utils.presenter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 import me.sniggle.android.utils.adapter.BaseRecyclerViewAdapter;
@@ -33,10 +34,8 @@ public class BaseFragmentRecyclerPresenter<Adapter extends BaseRecyclerViewAdapt
   }
 
   @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
-    preViewCreated();
-    viewCreated(view);
-    postViewCreated();
+  public void onViewCreated(View view, Bundle savedInstanceState, Fragment fragment) {
+    super.onViewCreated(view);
   }
 
   @Override
