@@ -12,12 +12,12 @@ import me.sniggle.android.utils.application.BaseContext;
  */
 public class BaseFragmentRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, AdapterItem, Ctx extends BaseContext> extends BaseRecyclerPresenter<Adapter, AdapterItem, Ctx> implements FragmentPresenter{
 
-  protected BaseFragmentRecyclerPresenter(Ctx appContext, int recyclerViewId) {
-    super(appContext, recyclerViewId);
+  protected BaseFragmentRecyclerPresenter(Ctx appContext, int recyclerViewId, Adapter adapter) {
+    super(appContext, recyclerViewId, adapter);
   }
 
-  protected BaseFragmentRecyclerPresenter(Ctx appContext, int recyclerViewId, int loadingContainerId) {
-    super(appContext, recyclerViewId, loadingContainerId);
+  protected BaseFragmentRecyclerPresenter(Ctx appContext, int recyclerViewId, int loadingContainerId, Adapter adapter) {
+    super(appContext, recyclerViewId, loadingContainerId, adapter);
   }
 
   @Override

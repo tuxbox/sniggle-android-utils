@@ -34,9 +34,11 @@ public class BaseRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, Adap
    *  the applications dependency context
    * @param recyclerViewId
    *  the id of the recycler view
+   * @param  adapter
+   *  the data adapter
    */
-  protected BaseRecyclerPresenter(Ctx appContext, int recyclerViewId) {
-    this(appContext, recyclerViewId, -1);
+  protected BaseRecyclerPresenter(Ctx appContext, int recyclerViewId, Adapter adapter) {
+    this(appContext, recyclerViewId, -1, adapter);
   }
 
   /**
@@ -47,11 +49,14 @@ public class BaseRecyclerPresenter<Adapter extends BaseRecyclerViewAdapter, Adap
    *   the id of the recycler view
    * @param loadingContainerId
    *   the id of the loading container to be shown instead of the recycler view while loading data
+   * @param adapter
+   *   the data adapter
    */
-  protected BaseRecyclerPresenter(Ctx appContext, int recyclerViewId, int loadingContainerId) {
+  protected BaseRecyclerPresenter(Ctx appContext, int recyclerViewId, int loadingContainerId, Adapter adapter) {
     super(appContext);
     this.recyclerViewId = recyclerViewId;
     this.loadingContainerId = loadingContainerId;
+    this.adapter = adapter;
   }
 
   /**
