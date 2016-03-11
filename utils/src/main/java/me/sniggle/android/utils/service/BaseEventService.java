@@ -11,6 +11,7 @@ import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.application.BaseCouchbase;
 import me.sniggle.android.utils.otto.ActivatorBus;
+import me.sniggle.android.utils.service.handler.EventHandler;
 
 /**
  * Basic Android Service supposed to be used for all events that trigger long-running tasks,
@@ -21,7 +22,7 @@ import me.sniggle.android.utils.otto.ActivatorBus;
  */
 public abstract class BaseEventService<HttpService, Database extends BaseCouchbase, AppBus extends ActivatorBus, Ctx extends BaseContext<HttpService, Database, AppBus>, App extends BaseApplication<Ctx>> extends Service {
 
-  private final LinkedList<Object> eventHandlers = new LinkedList<>();
+  private final LinkedList<EventHandler> eventHandlers = new LinkedList<>();
 
   protected Ctx getAppContext() {
     return ((App)getApplication()).getAppContext();
@@ -75,6 +76,9 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
    * initializer method, set up your service here, bound to #onCreate
    */
   protected void create() {
+    for( EventHandler eventHandler : eventHandlers ) {
+      eventHandler.onCreate();
+    }
   }
 
   /**
@@ -88,9 +92,10 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
    * life cycle function, deregisters the event handlers properly
    */
   protected void unregisterHandlers() {
-    Object eventHandler = null;
+    EventHandler eventHandler = null;
     while( ( eventHandler = eventHandlers.pollLast() ) != null ) {
       getAppContext().getBus().unregister(eventHandler);
+      eventHandler.onDestroy();
     }
   }
 
@@ -100,7 +105,7 @@ public abstract class BaseEventService<HttpService, Database extends BaseCouchba
    * @param eventHandler
    *  the event handler to add
    */
-  protected void addEventHandler(Object eventHandler) {
+  protected void addEventHandler(EventHandler eventHandler) {
     if( eventHandler != null ) {
       getAppContext().getBus().register(eventHandler);
       eventHandlers.add(eventHandler);
