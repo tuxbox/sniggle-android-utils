@@ -27,10 +27,14 @@ public abstract class BaseApplication<Context extends BaseContext> extends Appli
     return appContext;
   }
 
+  protected void initACRA() {
+    ACRA.init(this);
+  }
+
   @Override
   public void onCreate() {
     super.onCreate();
-    ACRA.init(this);
+    initACRA();
     appContext = createContext();
     appContext.onCreate();
   }
