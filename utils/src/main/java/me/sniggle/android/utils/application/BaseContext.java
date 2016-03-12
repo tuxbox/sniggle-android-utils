@@ -48,6 +48,14 @@ public abstract class BaseContext<HttpService, Database extends BaseCouchbase, A
   }
 
   /**
+   * use this method to refresh and reconfigure retrofit, e.g. to switch Retrofit backend target
+   */
+  public void refreshHttpService() {
+    this.retrofit = configureRetrofit(new Retrofit.Builder(), httpClientBuilder.build());
+    this.httpService = this.retrofit.create(httpServiceClass);
+  }
+
+  /**
    * create the appropriate event bus for your app
    *
    * @return the app's event bus
@@ -176,6 +184,8 @@ public abstract class BaseContext<HttpService, Database extends BaseCouchbase, A
   }
 
   /**
+   * <b>Do not hold a reference of the HttpService beyond method scope</b>
+   * otherwise #refreshHttpService() might not have the desired effect
    *
    * @return the retrofit API service
    */
