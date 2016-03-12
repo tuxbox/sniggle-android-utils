@@ -110,23 +110,11 @@ public abstract class BaseDialogFragment<Ctx extends BaseContext, Application ex
    */
   protected abstract Dialog createDialog(Bundle savedInstanceState);
 
-  @Nullable
-  @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    presenter.onCreateView();
-    preCreateView();
-    return super.onCreateView(inflater, container, savedInstanceState);
-  }
-
-  @Override
-  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    presenter.onViewCreated(view);
-  }
-
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
+    preCreateView();
+    presenter.onCreateView();
     return createDialog(savedInstanceState);
   }
 
@@ -139,6 +127,7 @@ public abstract class BaseDialogFragment<Ctx extends BaseContext, Application ex
   @Override
   public void onStart() {
     super.onStart();
+    presenter.onViewCreated(getDialog());
     presenter.onStart();
   }
 
