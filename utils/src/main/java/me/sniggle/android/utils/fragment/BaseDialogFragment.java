@@ -1,45 +1,35 @@
 package me.sniggle.android.utils.fragment;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.lang.reflect.Constructor;
 
 import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.presenter.BasePresenter;
-import me.sniggle.android.utils.presenter.FragmentPresenter;
+import me.sniggle.android.utils.presenter.DialogFragmentPresenter;
 
 /**
- * A convenience fragment implementation, automatically inflating the associated layout,
- * creating the appropriate presenter, registering the fragment as subscriber to the event bus
- * and allowing to publish new events
- *
- * @author iulius
- * @since 1.0
+ * Created by iulius on 12/03/16.
  */
-public abstract class BaseFragment<Ctx extends BaseContext, Application extends BaseApplication<Ctx>, Presenter extends BasePresenter<Ctx> & FragmentPresenter> extends Fragment {
+public abstract class BaseDialogFragment<Ctx extends BaseContext, Application extends BaseApplication<Ctx>, Presenter extends BasePresenter<Ctx> & DialogFragmentPresenter> extends DialogFragment {
 
   private final Class<Presenter> presenterClass;
-  private final int layoutId;
 
   private Presenter presenter;
 
   /**
    *
-   * @param layoutId
-   *  the id of the required layout
    * @param presenterClass
    *  the class of the presenter to be used
    */
-  protected BaseFragment(int layoutId, Class<Presenter> presenterClass) {
-    this.layoutId = layoutId;
+  protected BaseDialogFragment(Class<Presenter> presenterClass) {
     this.presenterClass = presenterClass;
   }
 
@@ -55,7 +45,7 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
   /**
    *
    * @return
-   *  the fragment's presenter
+   *  the dialog fragment's presenter
    */
   protected Presenter getPresenter() {
     return presenter;
@@ -96,21 +86,6 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
   }
 
   /**
-   * creates the view like the Android method {#onCreateView}
-   *
-   * @param inflater
-   *  the inflater
-   * @param container
-   *  the container
-   * @param savedInstanceState
-   *  the saved instance state
-   * @return the inflated view
-   */
-  protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    return inflater.inflate(layoutId, container, false);
-  }
-
-  /**
    * performs configurations using the newly created view, e.g. initializing the associated presenter
    *
    * @param view
@@ -118,7 +93,7 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
    * @param savedInstanceState
    *  the saved instance state
    */
-  protected void postCreateView(View view, Bundle savedInstanceState) {
+  protected void postCreateView(Dialog view, Bundle savedInstanceState) {
     if( presenter == null ) {
       throw new RuntimeException("Failed to create presenter for fragment");
     }
@@ -138,20 +113,23 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
     presenter.onCreate(savedInstanceState);
   }
 
-  @Nullable
+  /**
+   * creates and sets up the Dialog to be shown
+   *
+   * @param savedInstanceState
+   *  the saved instance state as provided in onCreateDialog
+   * @return the dialog to show
+   */
+  protected abstract Dialog createDialog(Bundle savedInstanceState);
+
+  @NonNull
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
     presenter.onCreateView();
     preCreateView();
-    View result = createView(inflater, container, savedInstanceState);
+    Dialog result = createDialog(savedInstanceState);
     postCreateView(result, savedInstanceState);
     return result;
-  }
-
-  @Override
-  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    presenter.onViewCreated(view, savedInstanceState, this);
   }
 
   @Override
@@ -203,5 +181,4 @@ public abstract class BaseFragment<Ctx extends BaseContext, Application extends 
     presenter = null;
     super.onDetach();
   }
-
 }
