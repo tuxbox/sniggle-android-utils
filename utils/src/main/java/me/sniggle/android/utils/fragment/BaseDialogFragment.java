@@ -7,6 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.lang.reflect.Constructor;
 
@@ -85,21 +88,6 @@ public abstract class BaseDialogFragment<Ctx extends BaseContext, Application ex
     getAppContext().getBus().register(this);
   }
 
-  /**
-   * performs configurations using the newly created view, e.g. initializing the associated presenter
-   *
-   * @param view
-   *  the just created view
-   * @param savedInstanceState
-   *  the saved instance state
-   */
-  protected void postCreateView(Dialog view, Bundle savedInstanceState) {
-    if( presenter == null ) {
-      throw new RuntimeException("Failed to create presenter for fragment");
-    }
-    presenter.onViewCreated(view);
-  }
-
   @Override
   public void onAttach(Context context) {
     super.onAttach(context);
@@ -122,14 +110,24 @@ public abstract class BaseDialogFragment<Ctx extends BaseContext, Application ex
    */
   protected abstract Dialog createDialog(Bundle savedInstanceState);
 
+  @Nullable
+  @Override
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    presenter.onCreateView();
+    preCreateView();
+    return super.onCreateView(inflater, container, savedInstanceState);
+  }
+
+  @Override
+  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    presenter.onViewCreated(view);
+  }
+
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    presenter.onCreateView();
-    preCreateView();
-    Dialog result = createDialog(savedInstanceState);
-    postCreateView(result, savedInstanceState);
-    return result;
+    return createDialog(savedInstanceState);
   }
 
   @Override

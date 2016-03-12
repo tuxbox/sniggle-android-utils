@@ -110,18 +110,6 @@ public abstract class BasePresenter<Ctx extends BaseContext> {
   }
 
   /**
-   * life cycle method used to initialize and e.g. bind views
-   * of the given container
-   *
-   * @param dialog
-   */
-  public void onViewCreated(Dialog dialog) {
-    preViewCreated();
-    viewCreated(dialog);
-    postViewCreated();
-  }
-
-  /**
    * life cycle method used to clean up, e.g. free the bound views
    */
   public void onDestroyView() {
