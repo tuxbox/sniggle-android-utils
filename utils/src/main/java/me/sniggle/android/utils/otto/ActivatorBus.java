@@ -50,7 +50,7 @@ public class ActivatorBus extends Bus {
   public void activateBus() {
     synchronized (LOCK) {
       for( Object event : eventCache ) {
-        post(event);
+        post(event, true);
       }
       eventCache.clear();
       active = true;
@@ -66,14 +66,27 @@ public class ActivatorBus extends Bus {
     }
   }
 
+  /**
+   * allows enforcement of event publishing, e.g. after bus activation.
+   * if used inappropriately it will lead to DeadEvents
+   *
+   * @param event
+   *  the event to publish
+   * @param enforcePublish
+   *  the flag indicating whether to enforce publication
+   */
+  protected void post(final Object event, boolean enforcePublish) {
+    if (enforcePublish) {
+      postEvent(event);
+    } else {
+      eventCache.add(event);
+    }
+  }
+
   @Override
   public void post(final Object event) {
     synchronized (LOCK) {
-      if (active) {
-        postEvent(event);
-      } else {
-        eventCache.add(event);
-      }
+      post(event, active);
     }
   }
 
