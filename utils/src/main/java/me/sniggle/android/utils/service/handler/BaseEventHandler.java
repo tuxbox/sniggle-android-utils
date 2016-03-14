@@ -11,34 +11,107 @@ import me.sniggle.android.utils.application.BaseContext;
  */
 public class BaseEventHandler<Ctx extends BaseContext> implements EventHandler {
 
-  private final Ctx appContext;
-  private final HandlerThread handlerThread = new HandlerThread(getClass().getCanonicalName());
+  /**
+   * A thread safe handler thread that indicates whether the task could be posted
+   * concurrently successfully
+   */
+  private final class EventHandlerThread extends HandlerThread {
 
+    private Handler handler;
+
+    public EventHandlerThread(String name) {
+      super(name);
+    }
+
+    @Override
+    protected void onLooperPrepared() {
+      super.onLooperPrepared();
+      synchronized (this) {
+        handler = new Handler(getLooper());
+      }
+    }
+
+    /**
+     * post the task to the thread if available
+     *
+     * @param runnable
+     *  the task to execute
+     * @return true if the task could be posted to the concurrent thread
+     */
+    public boolean post(Runnable runnable) {
+      boolean result = false;
+      synchronized (this) {
+        if( handler != null ) {
+          handler.post(runnable);
+          result = true;
+        }
+      }
+      return result;
+    }
+
+  }
+
+  private final Ctx appContext;
+  private final EventHandlerThread handlerThread = new EventHandlerThread(getClass().getCanonicalName());
+
+  /**
+   * constructor
+   *
+   * @param appContext
+   *    the main app dependency context
+   */
   protected BaseEventHandler(Ctx appContext) {
     this.appContext = appContext;
   }
 
+  /**
+   *
+   * @return the app dependency context
+   */
   protected Ctx getAppContext() {
     return appContext;
   }
 
+  /**
+   * publishes an event to the applications event bus
+   *
+   * @param event
+   *  the event to be published
+   */
   protected void publishEvent(Object event) {
     appContext.getBus().post(event);
   }
 
-  protected void runBackgroundTask(Runnable task) {
-    new Handler(handlerThread.getLooper()).post(task);
+  /**
+   * performs a task on a background thread
+   *
+   * @param task
+   *  the task to be performed
+   * @return true if the task could be posted to the background thread
+   */
+  protected boolean runBackgroundTask(Runnable task) {
+    if( !handlerThread.isAlive() ) {
+      handlerThread.start();
+    }
+    return handlerThread.post(task);
   }
 
+  /**
+   * @see EventHandler#onCreate()
+   */
   public void onCreate() {
-    handlerThread.start();
   }
 
+  /**
+   * @see EventHandler#onDestroy()
+   */
   public void onDestroy() {
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      handlerThread.quitSafely();
-    } else {
-      handlerThread.quit();
+    if( handlerThread.isAlive() ) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        handlerThread.quitSafely();
+      } else {
+        handlerThread.quit();
+      }
     }
   }
 
