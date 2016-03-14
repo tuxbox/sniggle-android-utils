@@ -14,6 +14,8 @@ public final class Utils {
 
   private static final DecimalFormat DECIMAL_FORMAT_DISTANCE = new DecimalFormat("#.#");
 
+  private static final DecimalFormat DECIMAL_FORMAT_DISTANCE_WO_DECIMALS = new DecimalFormat("#");
+
   private Utils() {
   }
 
@@ -47,7 +49,26 @@ public final class Utils {
    * @return a number with at least one digit and exactly one decimal
    */
   public static String formatDistance(double value) {
-    return DECIMAL_FORMAT_DISTANCE.format(value);
+    return formatDistanceWithDecimals(value, true);
+  }
+
+  /**
+   * formats the given value like a distance value
+   *
+   * @param value
+   *  the value to be formatted
+   * @param decimalFlag
+   *  whether or not one decimal should be present
+   * @return the formatted value with optionally one decimal
+   */
+  public static String formatDistanceWithDecimals(double value, boolean decimalFlag) {
+    String result;
+    if( decimalFlag ) {
+      result = DECIMAL_FORMAT_DISTANCE.format(value);
+    } else {
+      result = DECIMAL_FORMAT_DISTANCE_WO_DECIMALS.format(value);
+    }
+    return result;
   }
 
   /**
