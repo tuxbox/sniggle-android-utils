@@ -49,7 +49,8 @@ public class ActivatorBus extends Bus {
    */
   public void activateBus() {
     synchronized (LOCK) {
-      for( Object event : eventCache ) {
+      LinkedHashSet<Object> localCopy = new LinkedHashSet<>(eventCache);
+      for( Object event : localCopy ) {
         post(event, true);
       }
       eventCache.clear();
