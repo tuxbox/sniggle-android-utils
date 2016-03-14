@@ -4,6 +4,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import me.sniggle.android.utils.application.BaseContext;
 
 /**
@@ -18,6 +21,7 @@ public class BaseEventHandler<Ctx extends BaseContext> implements EventHandler {
   private final class EventHandlerThread extends HandlerThread {
 
     private Handler handler;
+    private Queue<Runnable> bufferQueue = new LinkedList<>();
 
     public EventHandlerThread(String name) {
       super(name);
@@ -28,6 +32,10 @@ public class BaseEventHandler<Ctx extends BaseContext> implements EventHandler {
       super.onLooperPrepared();
       synchronized (this) {
         handler = new Handler(getLooper());
+      }
+      Runnable task = null;
+      while( (task = bufferQueue.poll()) != null ) {
+        post(task);
       }
     }
 
@@ -44,6 +52,8 @@ public class BaseEventHandler<Ctx extends BaseContext> implements EventHandler {
         if( handler != null ) {
           handler.post(runnable);
           result = true;
+        } else {
+          bufferQueue.add(runnable);
         }
       }
       return result;
