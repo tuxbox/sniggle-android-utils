@@ -107,7 +107,7 @@ public final class DistanceCalculator {
           if( baseDistance > 1000 ) {
             result.append(Utils.formatDistance(baseDistance / 1000.0)).append(" km");
           } else {
-            result.append(distanceInMeters).append(" m");
+            result.append(Math.round(distanceInMeters)).append(" m");
           }
           break;
         case US:
