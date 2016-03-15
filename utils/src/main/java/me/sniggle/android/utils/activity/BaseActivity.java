@@ -41,7 +41,7 @@ public abstract class BaseActivity<
     > extends AppCompatActivity {
 
   private final int layoutId;
-  private final Class<Presenter> presenterClass;
+  protected final Class<Presenter> presenterClass;
   private Presenter presenter;
 
   /**
