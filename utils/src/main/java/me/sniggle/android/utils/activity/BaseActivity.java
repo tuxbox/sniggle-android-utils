@@ -90,6 +90,10 @@ public abstract class BaseActivity<
     return presenter;
   }
 
+  protected PermissionDelegate getPermissionDelegate() {
+    return permissionDelegate;
+  }
+
   protected void publishEvent(Object event) {
     getAppContext().getBus().post(event);
   }
