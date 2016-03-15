@@ -78,7 +78,7 @@ public abstract class BaseActivity<
     return presenter;
   }
 
-  protected <T extends BasePermissionDelegate<?>> T createBasePermissionDelegate() {
+  protected PermissionDelegate createBasePermissionDelegate() {
     return  null;
   }
 
