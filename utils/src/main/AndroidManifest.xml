@@ -2,4 +2,5 @@
 <manifest package="me.sniggle.android.utils"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 </manifest>

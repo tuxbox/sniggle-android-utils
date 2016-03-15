@@ -1,6 +1,8 @@
 package me.sniggle.android.utils.activity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -10,6 +12,8 @@ import me.sniggle.android.utils.application.BaseApplication;
 import me.sniggle.android.utils.application.BaseContext;
 import me.sniggle.android.utils.application.BaseCouchbase;
 import me.sniggle.android.utils.otto.ActivatorBus;
+import me.sniggle.android.utils.permission.BasePermissionDelegate;
+import me.sniggle.android.utils.permission.PermissionDelegate;
 import me.sniggle.android.utils.presenter.ActivityPresenter;
 import me.sniggle.android.utils.presenter.BaseActivityPresenter;
 import me.sniggle.android.utils.presenter.BasePresenter;
@@ -38,11 +42,12 @@ public abstract class BaseActivity<
       Ctx extends BaseContext<HttpService, Database, AppBus>,
       Application extends BaseApplication<Ctx>,
       Presenter extends BasePresenter<Ctx> & ActivityPresenter
-    > extends AppCompatActivity {
+    > extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
   private final int layoutId;
   protected final Class<Presenter> presenterClass;
   private Presenter presenter;
+  private PermissionDelegate permissionDelegate;
 
   /**
    *
@@ -73,6 +78,10 @@ public abstract class BaseActivity<
     return presenter;
   }
 
+  protected <T extends BasePermissionDelegate<?>> T createBasePermissionDelegate() {
+    return  null;
+  }
+
   protected Ctx getAppContext() {
     return ((Application)getApplication()).getAppContext();
   }
@@ -86,7 +95,7 @@ public abstract class BaseActivity<
   }
 
   protected void preCreate() {
-
+    permissionDelegate = createBasePermissionDelegate();
   }
 
   protected void create(Bundle savedInstanceState) {
@@ -104,11 +113,21 @@ public abstract class BaseActivity<
   }
 
   @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    if( permissionDelegate != null ) {
+      permissionDelegate.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+  }
+
+  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     preCreate();
     create(savedInstanceState);
     postCreate(savedInstanceState);
+    if( permissionDelegate != null ) {
+      permissionDelegate.ensurePermissions();
+    }
   }
 
   @Override
@@ -137,6 +156,7 @@ public abstract class BaseActivity<
 
   @Override
   protected void onDestroy() {
+    permissionDelegate = null;
     presenter.onDestroy();
     getAppContext().getBus().unregister(this);
     super.onDestroy();
