@@ -71,33 +71,4 @@ public final class Utils {
     return result;
   }
 
-  /**
-   * normalizes the given coordinate by offsetting latitude +90 and longitude +180
-   * and multiplying the values by 100.
-   *
-   * @param a
-   *  the coordinate to normalize
-   * @return the normalized coordinate (latitude [45.55] + longitude [127.5] as "1355530750")
-   */
-  public static String normalizeCoordinates(Coords a) {
-    return normalizeCoordinates(a.getLatitude(), a.getLongitude());
-  }
-
-  /**
-   * normalizes the given coordinate by offsetting latitude +90 and longitude +180
-   * and multiplying the values by 100.
-   *
-   * @param latitude
-   *   the latitude
-   * @param longitude
-   *   the longitude
-   * @return the normalized coordinate (latitude [45.55] + longitude [127.5] as "1355530750")
-   */
-  public static String normalizeCoordinates(double latitude, double longitude) {
-    double normalizedLatitude = (latitude + 90.0)*100;
-    double normalizedLongitude = (longitude + 180.0)*100;
-    return String.format("%05d%05d", Math.round(normalizedLatitude), Math.round(normalizedLongitude));
-  }
-
-
 }
